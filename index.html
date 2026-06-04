@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>徐淑珍老師分享 - 特教高職部結合 Wordwall & Padlet 遊戲教案生成器</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- html2pdf.js for Client-Side PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                        },
+                        sped: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .step-transition {
+            transition: all 0.3s ease-in-out;
+        }
+        /* A4 Document Preview Style */
+        .doc-page {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            font-family: 'Times New Roman', 'Noto Sans TC', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-tr from-brand-600 to-sped-500 text-white p-2.5 rounded-xl shadow-md">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-base sm:text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-700 to-sped-700">
+                            徐淑珍老師分享・特教高職部結合 Wordwall & Padlet 遊戲教案生成器
+                        </span>
+                        <p class="text-[10px] text-slate-500 hidden sm:block">符合108課綱特殊教育課程綱要・IEP調整指引・結合 Wordwall & Padlet 遊戲化教學模組</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs bg-sped-100 text-sped-700 px-2.5 py-1 rounded-full font-medium hidden lg:inline-flex items-center">
+                        <i class="fa-solid fa-circle-check mr-1.5"></i> 數位雙璧融入：Wordwall & Padlet
+                    </span>
+                    <button onclick="resetWizard()" class="text-sm text-slate-500 hover:text-slate-800 transition py-2 px-3 rounded-lg hover:bg-slate-100">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> 重設
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Wizard Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
+        <!-- Progress Steps -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-100 mb-6">
+            <div class="relative flex items-center justify-between w-full">
+                <!-- Progress Line Background -->
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-200 -z-10 rounded"></div>
+                <!-- Dynamic Progress Line Fill -->
+                <div id="progress-bar" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-brand-500 to-sped-500 -z-10 rounded transition-all duration-300" style="width: 0%;"></div>
+
+                <!-- Step Icons -->
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center z-10">
+                    <div id="step-node-1" class="w-10 h-10 rounded-full flex items-center justify-center bg-brand-600 text-white font-bold shadow-md transition-all duration-300">
+                        1
+                    </div>
+                    <span class="text-xs mt-2 font-semibold text-brand-700">教學主題</span>
+                </div>
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center z-10">
+                    <div id="step-node-2" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 text-slate-600 font-bold transition-all duration-300">
+                        2
+                    </div>
+                    <span class="text-xs mt-2 text-slate-500 font-medium">時間配比</span>
+                </div>
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center z-10">
+                    <div id="step-node-3" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 text-slate-600 font-bold transition-all duration-300">
+                        3
+                    </div>
+                    <span class="text-xs mt-2 text-slate-500 font-medium">特教對象</span>
+                </div>
+                <!-- Step 4 -->
+                <div class="flex flex-col items-center z-10">
+                    <div id="step-node-4" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 text-slate-600 font-bold transition-all duration-300">
+                        4
+                    </div>
+                    <span class="text-xs mt-2 text-slate-500 font-medium">遊戲融入</span>
+                </div>
+                <!-- Step 5 -->
+                <div class="flex flex-col items-center z-10">
+                    <div id="step-node-5" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 text-slate-600 font-bold transition-all duration-300">
+                        5
+                    </div>
+                    <span class="text-xs mt-2 text-slate-500 font-medium">生成教案</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wizard Content Area -->
+        <div class="flex-grow flex flex-col">
+            
+            <!-- STEP 1: SELECT THEME -->
+            <div id="step-content-1" class="step-transition block">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex-grow">
+                    <div class="mb-6">
+                        <span class="text-xs font-semibold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Step 1</span>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-2">選擇您的教學領域與單元主題</h2>
+                        <p class="text-slate-500 text-sm mt-1">請選擇符合特教高職部課綱的學科領域，或自訂專屬主題。</p>
+                    </div>
+
+                    <!-- Teacher Hsu Shu-chen's Insight Banner -->
+                    <div class="bg-gradient-to-r from-brand-50 to-sped-50 border border-brand-100 rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-start space-x-3.5">
+                            <div class="bg-white text-brand-600 p-3 rounded-2xl shadow-sm border border-brand-100 flex-shrink-0">
+                                <i class="fa-solid fa-chalkboard-user text-2xl text-brand-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-sm sm:text-base">徐淑珍老師・特教遊戲化教學心法分享</h3>
+                                <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+                                    「高職部特教生需要更多結構化、具體且趣味的重複練習。透過 <strong>Wordwall 的多感官配對</strong> 建立學習意願，再利用 <strong>Padlet 將實作成果數位化分享</strong>，能讓學生在掌聲與愛心回饋中建立自信，真正實踐適性揚才的 IEP 目標！」
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-white/80 backdrop-blur-sm border border-brand-200 px-3 py-1.5 rounded-xl text-center self-stretch sm:self-auto flex sm:flex-col justify-center items-center gap-1">
+                            <span class="text-[10px] text-brand-700 font-bold uppercase tracking-wide">教學模組分享</span>
+                            <span class="text-xs bg-brand-600 text-white px-2.5 py-0.5 rounded-md font-bold whitespace-nowrap">徐淑珍 老師</span>
+                        </div>
+                    </div>
+
+                    <!-- Domain Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Card 1: 職業生活 -->
+                        <div onclick="selectDomain('vocational')" id="domain-vocational" class="border-2 border-brand-500 bg-brand-50/30 p-5 rounded-2xl cursor-pointer hover:shadow-md transition-all duration-200 relative">
+                            <div class="absolute top-4 right-4 text-brand-600" id="check-vocational">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                            <div class="bg-brand-100 text-brand-700 w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-xl">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-800">職業生活領域</h3>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">培養餐飲、烘焙、門市服務、清潔維護及辦公事務等高職實用技能與工作態度。</p>
+                        </div>
+
+                        <!-- Card 2: 社會適應 -->
+                        <div onclick="selectDomain('social')" id="domain-social" class="border-2 border-slate-200 p-5 rounded-2xl cursor-pointer hover:border-brand-300 hover:shadow-md transition-all duration-200 relative">
+                            <div class="absolute top-4 right-4 text-slate-300 hidden" id="check-social">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                            <div class="bg-emerald-100 text-emerald-700 w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-800">社會適應領域</h3>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">增進大眾運輸搭乘、金錢使用、社區店家購物、社交技巧及人際溝通等社會融合能力。</p>
+                        </div>
+
+                        <!-- Card 3: 獨立生活 -->
+                        <div onclick="selectDomain('independent')" id="domain-independent" class="border-2 border-slate-200 p-5 rounded-2xl cursor-pointer hover:border-brand-300 hover:shadow-md transition-all duration-200 relative">
+                            <div class="absolute top-4 right-4 text-slate-300 hidden" id="check-independent">
+                                <i class="fa-solid fa-circle-check text-xl"></i>
+                            </div>
+                            <div class="bg-amber-100 text-amber-700 w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-xl">
+                                <i class="fa-solid fa-house-user"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-800">獨立生活領域</h3>
+                            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">深化個人衛生、居家整潔、飲食安全、自我保護及休閒生活等自主生活管理能力。</p>
+                        </div>
+                    </div>
+
+                    <!-- Subthemes presets -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">精選特教高職常用單元</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="subtheme-presets">
+                            <!-- Dynamic populated depending on selected domain -->
+                        </div>
+                    </div>
+
+                    <!-- Custom input -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <label for="custom-title" class="block text-sm font-semibold text-slate-700 mb-2">
+                            <i class="fa-solid fa-pen-nib text-brand-500 mr-1.5"></i>自訂或修改本次教案主題名稱
+                        </label>
+                        <input type="text" id="custom-title" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition shadow-sm text-sm" placeholder="例如：手部清潔與烘焙前準備工作">
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: TIME CONFIGURATION -->
+            <div id="step-content-2" class="step-transition hidden">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex-grow">
+                    <div class="mb-6">
+                        <span class="text-xs font-semibold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Step 2</span>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-2">設定教學時間與單元結構</h2>
+                        <p class="text-slate-500 text-sm mt-1">一節課為標準的 50 分鐘，系統將依據徐淑珍老師的結構化時間法為您自動生成高精確度的流程時間表。</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-6">
+                            <!-- Session Picker -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-3">設計教案總節數：</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <button onclick="setSessions(1)" id="session-btn-1" class="py-3 px-4 rounded-xl border-2 border-brand-500 bg-brand-50 text-brand-700 font-bold transition">1 節課 (50分)</button>
+                                    <button onclick="setSessions(2)" id="session-btn-2" class="py-3 px-4 rounded-xl border border-slate-200 hover:border-brand-200 text-slate-700 font-bold transition">2 節課 (100分)</button>
+                                    <button onclick="setSessions(3)" id="session-btn-3" class="py-3 px-4 rounded-xl border border-slate-200 hover:border-brand-200 text-slate-700 font-bold transition">3 節課 (150分)</button>
+                                </div>
+                            </div>
+
+                            <!-- Structural breakdown preview -->
+                            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                                <h4 class="text-sm font-bold text-slate-700 mb-3">
+                                    <i class="fa-solid fa-clock text-sped-500 mr-1.5"></i>徐老師結構化教學流程時間分配：
+                                </h4>
+                                <div class="space-y-3" id="timeline-breakdown">
+                                    <!-- Dynamic Timeline -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SpEd Tip Box -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+                            <h4 class="text-amber-800 font-bold flex items-center text-base mb-2">
+                                <i class="fa-solid fa-lightbulb text-amber-500 mr-2 text-lg"></i>徐淑珍老師特教指南：高結構短時循環
+                            </h4>
+                            <p class="text-amber-700 text-xs leading-relaxed mb-3">
+                                高職部特教班（如智能障礙、自閉症）由於專注力與認知局限，最有效的教學架構是<strong>「高結構化」且「多次短時間循環」</strong>。
+                            </p>
+                            <ul class="text-amber-700 text-xs space-y-2 list-disc list-inside">
+                                <li><strong>引起動機（約 10 分鐘）</strong>：以具體實物、影片或 Wordwall 簡單配對引起興趣。</li>
+                                <li><strong>發展活動（約 30 分鐘）</strong>：拆解步驟（工作分析），並結合實作與分組。</li>
+                                <li><strong>綜合活動（約 10 分鐘）</strong>：以 Padlet 上傳實作照片或利用增強系統給予具體回饋。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: TARGET AUDIENCE & IEP ADAPTATIONS -->
+            <div id="step-content-3" class="step-transition hidden">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex-grow">
+                    <div class="mb-6">
+                        <span class="text-xs font-semibold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Step 3</span>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-2">設定教學對象與 IEP 教學調整</h2>
+                        <p class="text-slate-500 text-sm mt-1">選定學生的特質，系統將自動於教案中生成相對應的「評量調整」、「內容調整」與「支持策略」。</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <!-- Disability Type -->
+                        <div class="border border-slate-200 p-5 rounded-2xl">
+                            <label class="block text-sm font-bold text-slate-700 mb-3">
+                                <i class="fa-solid fa-user-tag text-brand-500 mr-1.5"></i>主要障礙類別
+                            </label>
+                            <select id="disability-type" onchange="updateAcademics()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-sm">
+                                <option value="intellectual">智能障礙 (Intellectual Disability)</option>
+                                <option value="autism">自閉症 (ASD)</option>
+                                <option value="learning">學習障礙 (Learning Disability)</option>
+                                <option value="multiple">多重障礙 (Multiple Disabilities)</option>
+                            </select>
+                            
+                            <label class="block text-sm font-bold text-slate-700 mt-4 mb-3">障礙程度分級</label>
+                            <div class="flex space-x-2">
+                                <label class="flex-1 text-center py-2 border rounded-xl cursor-pointer hover:bg-slate-50 text-xs font-semibold" id="label-mild">
+                                    <input type="radio" name="severity" value="mild" checked class="sr-only"> 輕度
+                                </label>
+                                <label class="flex-1 text-center py-2 border rounded-xl cursor-pointer hover:bg-slate-50 text-xs font-semibold" id="label-moderate">
+                                    <input type="radio" name="severity" value="moderate" class="sr-only"> 中度
+                                </label>
+                                <label class="flex-1 text-center py-2 border rounded-xl cursor-pointer hover:bg-slate-50 text-xs font-semibold" id="label-severe">
+                                    <input type="radio" name="severity" value="severe" class="sr-only"> 重度
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Student Learning Traits -->
+                        <div class="border border-slate-200 p-5 rounded-2xl col-span-1 md:col-span-2">
+                            <label class="block text-sm font-bold text-slate-700 mb-3">
+                                <i class="fa-solid fa-heart text-sped-500 mr-1.5"></i>學生起點行為與特質 (可複選)
+                            </label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="traits-container">
+                                <!-- Dynamic Traits -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SpEd Support Strategies Checkboxes -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                        <label class="block text-sm font-bold text-slate-700 mb-3">
+                            <i class="fa-solid fa-puzzle-piece text-brand-500 mr-1.5"></i>徐老師課堂愛用 IEP 支持策略與教學調整措施 (自動融入教案流程)
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <label class="flex items-start p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-brand-50/20 transition text-xs">
+                                <input type="checkbox" id="strat-task" checked class="mt-0.5 mr-2.5 rounded text-brand-600 focus:ring-brand-500">
+                                <div>
+                                    <span class="font-bold text-slate-700 block">工作分析法 (Task Analysis)</span>
+                                    <span class="text-slate-500">將複雜技能拆解成可執行的單一步驟。</span>
+                                </div>
+                            </label>
+                            <label class="flex items-start p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-brand-50/20 transition text-xs">
+                                <input type="checkbox" id="strat-visual" checked class="mt-0.5 mr-2.5 rounded text-brand-600 focus:ring-brand-500">
+                                <div>
+                                    <span class="font-bold text-slate-700 block">視覺化提示 (Visual Support)</span>
+                                    <span class="text-slate-500">提供步驟圖卡、影片與結構性物理標示。</span>
+                                </div>
+                            </label>
+                            <label class="flex items-start p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-brand-50/20 transition text-xs">
+                                <input type="checkbox" id="strat-reinforce" checked class="mt-0.5 mr-2.5 rounded text-brand-600 focus:ring-brand-500">
+                                <div>
+                                    <span class="font-bold text-slate-700 block">代幣增強系統 (Token Economy)</span>
+                                    <span class="text-slate-500">實作完成後提供具體集點、貼紙等正面增強。</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4: INTERACTIVE GAME INTEGRATION -->
+            <div id="step-content-4" class="step-transition hidden">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex-grow">
+                    <div class="mb-6">
+                        <span class="text-xs font-semibold text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Step 4</span>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-2">融合數位遊戲與互動教學平台</h2>
+                        <p class="text-slate-500 text-sm mt-1">徐淑珍老師最推薦特教教學效果極佳的 Wordwall 及 Padlet，軟化抽象概念，增強學生的學習參與感。</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Wordwall Card -->
+                        <div class="border-2 border-slate-200 p-5 rounded-2xl hover:border-brand-500/50 transition duration-200">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="bg-blue-100 text-blue-700 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold">W</div>
+                                <div>
+                                    <h3 class="font-bold text-slate-800">Wordwall 互動遊戲設計</h3>
+                                    <p class="text-xs text-slate-500">非常適合用作引起動機或課堂評量</p>
+                                </div>
+                            </div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">選擇適合特教生的模板：</label>
+                            <select id="wordwall-template" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-sm mb-4">
+                                <option value="matching">配對遊戲 (Match Up) - 圖片與關鍵字對應，極佳視覺線索</option>
+                                <option value="wheel">隨機輪盤 (Random Wheel) - 抽問、挑選實作項目，增添趣味性</option>
+                                <option value="quiz">簡單測驗 (Quiz) - 附圖形選項的大字體單選，降低閱讀障礙</option>
+                            </select>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Wordwall 遊戲具體規劃描述：</label>
+                            <textarea id="wordwall-desc" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-xs h-24" placeholder="例如：設計『烘焙工具與材料配對』遊戲。左側為烤盤、刮刀等實物照片，右側為大字體文字。引導智障中度學生完成拖曳配對，答對者可得到集點貼紙一隻。"></textarea>
+                        </div>
+
+                        <!-- Padlet Card -->
+                        <div class="border-2 border-slate-200 p-5 rounded-2xl hover:border-brand-500/50 transition duration-200">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="bg-pink-100 text-pink-700 w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold">P</div>
+                                <div>
+                                    <h3 class="font-bold text-slate-800">Padlet 線上學習牆</h3>
+                                    <p class="text-xs text-slate-500">適合實作成果分享與同儕正面增強</p>
+                                </div>
+                            </div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">選擇學習牆應用模式：</label>
+                            <select id="padlet-template" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-sm mb-4">
+                                <option value="gallery">成果展示牆 (Canvas / Wall) - 拍攝學生步驟或完成品並上傳</option>
+                                <option value="column">步驟排序欄 (Shelf) - 將工作步驟按 1、2、3 順序分欄排列</option>
+                                <option value="feedback">感恩與肯定留言板 - 學生上傳愛心貼圖，互相給予正向回饋</option>
+                            </select>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Padlet 互動具體規劃描述：</label>
+                            <textarea id="padlet-desc" class="w-full p-3 rounded-xl border border-slate-300 focus:ring-brand-500 focus:border-brand-500 text-xs h-24" placeholder="例如：教師協助拍攝每位學生的『完成包裝蛋糕盒』實作照片，並將其發布到 Padlet 專屬牆上。每位學生可在自己的照片下，獲得老師蓋印的電子笑臉貼圖，建立學習成就感。"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5: GENERATE & EXPORT (GOOGLE DOCS LOOK) -->
+            <div id="step-content-5" class="step-transition hidden flex-grow flex flex-col">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-grow">
+                    <!-- Control Sidebar -->
+                    <div class="lg:col-span-1 bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs font-semibold text-sped-600 bg-sped-50 px-2.5 py-1 rounded-full">最終步 Step 5</span>
+                            <h3 class="text-lg font-bold text-slate-800 mt-2">徐老師分享教案已生成！</h3>
+                            <p class="text-xs text-slate-500 mt-1">
+                                右側顯示 Google 文件風格排版的 A4 教案。您可<strong>直接在教案中點選文字進行修改與微調</strong>。
+                            </p>
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 mt-4 text-xs">
+                                <span class="font-bold text-blue-800 flex items-center mb-1">
+                                    <i class="fa-solid fa-pen-to-square mr-1"></i> 提示：可即時編輯
+                                </span>
+                                <p class="text-blue-700 leading-relaxed">
+                                    教案預覽區的文字全部具備**可編輯功能**，您可以任意調整流程或補充備註。
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 pt-4 border-t border-slate-100">
+                            <!-- Download / Export Buttons -->
+                            <button onclick="copyToClipboard()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl shadow transition text-sm flex items-center justify-center">
+                                <i class="fa-solid fa-copy mr-2"></i> 複製教案全文
+                            </button>
+                            <button onclick="downloadAsDoc()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-sm flex items-center justify-center">
+                                <i class="fa-solid fa-file-word mr-2"></i> 下載為 Google / Word 文件
+                            </button>
+                            <button onclick="downloadAsPDF()" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-sm flex items-center justify-center">
+                                <i class="fa-solid fa-file-pdf mr-2"></i> 下載 PDF 文件
+                            </button>
+                            <button onclick="window.print()" class="w-full border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-4 rounded-xl transition text-sm flex items-center justify-center">
+                                <i class="fa-solid fa-print mr-2"></i> 直接列印 / 瀏覽器 PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Google Doc Style Preview -->
+                    <div class="lg:col-span-3 flex flex-col">
+                        <div class="bg-slate-200 px-4 py-2 rounded-t-2xl flex items-center justify-between border-b border-slate-300 text-xs text-slate-600">
+                            <span class="font-medium"><i class="fa-regular fa-file-lines mr-1.5 text-slate-500"></i> 教案線上即時編輯與預覽頁面 (徐淑珍老師教學架構)</span>
+                            <span class="bg-emerald-500 text-white px-2 py-0.5 rounded text-[10px] uppercase font-bold">相容 Google Drive</span>
+                        </div>
+                        <div class="doc-page flex-grow p-8 sm:p-12 overflow-y-auto max-h-[750px] rounded-b-2xl border-t-0" id="document-preview" contenteditable="true">
+                            <!-- Dynamically generated lesson plan will render here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div id="wizard-navigation" class="mt-6 flex justify-between items-center py-4 bg-white px-6 rounded-2xl shadow-sm border border-slate-100">
+                <button id="prev-btn" onclick="prevStep()" class="invisible flex items-center px-5 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 font-bold text-slate-700 transition duration-150 text-sm">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> 上一步
+                </button>
+                <div class="text-xs text-slate-400 hidden sm:block">請確實填寫所有資訊，以生成最高品質的特教遊戲化教案。</div>
+                <button id="next-btn" onclick="nextStep()" class="flex items-center px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-sped-600 hover:from-brand-700 hover:to-sped-700 font-bold text-white shadow-md hover:shadow-lg transition duration-150 text-sm">
+                    下一步 <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <script>
+        // --- CONSTANTS & DATABASE ---
+        const domains = {
+            vocational: {
+                title: "職業生活領域",
+                presets: [
+                    { id: "v_baking", text: "烘焙包裝與蛋糕盒折疊" },
+                    { id: "v_dining", text: "餐飲服務：桌面擦拭與排設" },
+                    { id: "v_retail", text: "門市服務：商品上架與排面整理" },
+                    { id: "v_office", text: "辦公事務：文件碎紙與裝訂" }
+                ],
+                traits: [
+                    { id: "t_v1", text: "手部精細動作與協調性偏弱" },
+                    { id: "t_v2", text: "工作步驟記憶短暫，常遺忘細節" },
+                    { id: "t_v3", text: "對於工作安全意識（如烤箱防燙）需重複提示" },
+                    { id: "t_v4", text: "需要高度重複操作才能建立肌肉記憶" }
+                ]
+            },
+            social: {
+                title: "社會適應領域",
+                presets: [
+                    { id: "s_bus", text: "搭乘公車：感應卡使用與乘車禮儀" },
+                    { id: "s_shop", text: "社區購物：比價與收銀檯付款實務" },
+                    { id: "s_clinic", text: "看病掛號：健保卡使用與診間等待" },
+                    { id: "s_phone", text: "社交技巧：接聽電話與點餐應對" }
+                ],
+                traits: [
+                    { id: "t_s1", text: "在公共場所容易緊張、焦慮或退縮" },
+                    { id: "t_s2", text: "口語表達能力較弱，難以完整表達需求" },
+                    { id: "t_s3", text: "金錢計算與找零概念不佳" },
+                    { id: "t_s4", text: "對社會情境物理提示（如公車跑馬燈）不敏感" }
+                ]
+            },
+            independent: {
+                title: "獨立生活領域",
+                presets: [
+                    { id: "i_hygiene", text: "個人衛生：正確洗手（內外夾弓大立腕）" },
+                    { id: "i_cooking", text: "飲食安全：電鍋蒸飯操作與安全" },
+                    { id: "i_sorting", text: "居家整理：資源回收物分類與壓扁" },
+                    { id: "i_disaster", text: "自我保護：火災與地震逃生實作演練" }
+                ],
+                traits: [
+                    { id: "t_i1", text: "生活自理動作（如垃圾打包）缺乏結構概念" },
+                    { id: "t_i2", text: "對周遭環境潛在危險（如插座用電）辨識力弱" },
+                    { id: "t_i3", text: "遇到突發狀況易恐慌、大叫或跑開" },
+                    { id: "t_i4", text: "時間觀念模糊，不知如何安排自主時間" }
+                ]
+            }
+        };
+
+        // --- APP STATE ---
+        let state = {
+            step: 1,
+            selectedDomain: 'vocational',
+            subTheme: '',
+            customTitle: '',
+            sessions: 1,
+            disabilityType: 'intellectual',
+            severity: 'moderate',
+            selectedTraits: [],
+            strategies: {
+                task: true,
+                visual: true,
+                reinforce: true
+            },
+            wordwallTemplate: 'matching',
+            wordwallDesc: '',
+            padletTemplate: 'gallery',
+            padletDesc: ''
+        };
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            selectDomain('vocational');
+            updateAcademics();
+            initRadioButtonHandlers();
+            updateTimeline();
+        };
+
+        // --- EVENT HANDLERS & DOM CONTROLLERS ---
+        function initRadioButtonHandlers() {
+            const radioLabels = {
+                mild: document.getElementById('label-mild'),
+                moderate: document.getElementById('label-moderate'),
+                severe: document.getElementById('label-severe')
+            };
+
+            const radios = document.getElementsByName('severity');
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    state.severity = e.target.value;
+                    // Reset styling
+                    Object.values(radioLabels).forEach(label => {
+                        label.classList.remove('bg-brand-500', 'text-white', 'border-brand-500');
+                        label.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+                    });
+                    // Style selected
+                    const activeLabel = radioLabels[state.severity];
+                    activeLabel.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+                    activeLabel.classList.add('bg-brand-500', 'text-white', 'border-brand-500');
+                });
+            });
+
+            // Trigger initial styling
+            document.querySelector('input[name="severity"][value="moderate"]').click();
+        }
+
+        function selectDomain(domainId) {
+            state.selectedDomain = domainId;
+            
+            // Toggle Domain cards active classes
+            ['vocational', 'social', 'independent'].forEach(id => {
+                const card = document.getElementById(`domain-${id}`);
+                const check = document.getElementById(`check-${id}`);
+                if (id === domainId) {
+                    card.className = "border-2 border-brand-500 bg-brand-50/30 p-5 rounded-2xl cursor-pointer hover:shadow-md transition-all duration-200 relative";
+                    check.classList.remove('hidden');
+                } else {
+                    card.className = "border-2 border-slate-200 p-5 rounded-2xl cursor-pointer hover:border-brand-300 hover:shadow-md transition-all duration-200 relative";
+                    check.classList.add('hidden');
+                }
+            });
+
+            // Populate presets
+            const presetContainer = document.getElementById('subtheme-presets');
+            presetContainer.innerHTML = '';
+            
+            domains[domainId].presets.forEach((preset, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = "p-3 rounded-xl border text-left text-xs font-semibold hover:border-brand-500 hover:bg-brand-50 transition duration-150 " + 
+                                   (index === 0 ? "border-brand-500 bg-brand-50/50 text-brand-800" : "border-slate-200 text-slate-700");
+                button.onclick = () => selectPreset(preset.text, button);
+                button.innerText = preset.text;
+                presetContainer.appendChild(button);
+            });
+
+            // Trigger select first preset by default
+            selectPreset(domains[domainId].presets[0].text, presetContainer.firstChild);
+
+            // Populate Student Traits based on domain
+            populateTraits();
+        }
+
+        function selectPreset(text, buttonElement) {
+            state.subTheme = text;
+            document.getElementById('custom-title').value = text;
+            state.customTitle = text;
+
+            // Update UI class of preset buttons
+            const buttons = document.getElementById('subtheme-presets').children;
+            for (let btn of buttons) {
+                btn.className = "p-3 rounded-xl border text-left text-xs font-semibold hover:border-brand-500 hover:bg-brand-50 transition duration-150 border-slate-200 text-slate-700";
+            }
+            if (buttonElement) {
+                buttonElement.className = "p-3 rounded-xl border text-left text-xs font-semibold hover:border-brand-500 hover:bg-brand-50 transition duration-150 border-brand-500 bg-brand-50/50 text-brand-800";
+            }
+        }
+
+        function populateTraits() {
+            const traitsContainer = document.getElementById('traits-container');
+            traitsContainer.innerHTML = '';
+            state.selectedTraits = [];
+
+            domains[state.selectedDomain].traits.forEach((trait, index) => {
+                const label = document.createElement('label');
+                label.className = "flex items-start p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-brand-50/10 transition text-xs";
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = "mt-0.5 mr-2.5 rounded text-brand-600 focus:ring-brand-500";
+                checkbox.value = trait.text;
+                if (index < 2) { // check first two by default
+                    checkbox.checked = true;
+                    state.selectedTraits.push(trait.text);
+                }
+                checkbox.onchange = (e) => {
+                    if (e.target.checked) {
+                        state.selectedTraits.push(trait.text);
+                    } else {
+                        state.selectedTraits = state.selectedTraits.filter(t => t !== trait.text);
+                    }
+                };
+
+                const div = document.createElement('div');
+                div.className = "text-slate-700 font-medium";
+                div.innerText = trait.text;
+
+                label.appendChild(checkbox);
+                label.appendChild(div);
+                traitsContainer.appendChild(label);
+            });
+        }
+
+        function updateAcademics() {
+            // Update Wordwall and Padlet default texts based on current inputs
+            const disName = getDisabilityTypeName(document.getElementById('disability-type').value);
+            const topic = document.getElementById('custom-title').value || state.subTheme;
+
+            document.getElementById('wordwall-desc').value = `配合『${topic}』單元，採用徐淑珍老師推薦的遊戲化設計。針對高職部【${disName}】生設計直觀的「多感官配對」教具：左側提供高解析實物步驟照片，右側標示放大且清晰的核心詞彙，透過反覆配對加深圖像記憶。`;
+            document.getElementById('padlet-desc').value = `在課堂收尾階段，教師拍攝每位學生『${topic}』實作成果照片，並建立專屬班級 Padlet 「成果牆」。引導學生在自己與同學的作品下，給予愛心互動與按讚。`;
+        }
+
+        function getDisabilityTypeName(code) {
+            switch(code) {
+                case 'intellectual': return '智能障礙';
+                case 'autism': return '自閉症';
+                case 'learning': return '學習障礙';
+                case 'multiple': return '多重障礙';
+                default: return '特教班';
+            }
+        }
+
+        function setSessions(count) {
+            state.sessions = count;
+            for(let i=1; i<=3; i++) {
+                const btn = document.getElementById(`session-btn-${i}`);
+                if (i === count) {
+                    btn.className = "py-3 px-4 rounded-xl border-2 border-brand-500 bg-brand-50 text-brand-700 font-bold transition";
+                } else {
+                    btn.className = "py-3 px-4 rounded-xl border border-slate-200 hover:border-brand-200 text-slate-700 font-bold transition";
+                }
+            }
+            updateTimeline();
+        }
+
+        function updateTimeline() {
+            const container = document.getElementById('timeline-breakdown');
+            const totalMin = state.sessions * 50;
+            
+            const p1 = Math.round(totalMin * 0.2); // 引起動機
+            const p2 = Math.round(totalMin * 0.6); // 發展活動
+            const p3 = Math.round(totalMin * 0.2); // 綜合活動
+
+            container.innerHTML = `
+                <div class="flex justify-between text-xs font-semibold mb-1">
+                    <span class="text-brand-600">準備與引起動機 (徐老師心法)</span>
+                    <span class="text-slate-500">${p1} 分鐘</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-2 mb-3">
+                    <div class="bg-brand-500 h-2 rounded-full" style="width: 20%"></div>
+                </div>
+
+                <div class="flex justify-between text-xs font-semibold mb-1">
+                    <span class="text-amber-600">發展活動 (工作分析與Wordwall)</span>
+                    <span class="text-slate-500">${p2} 分鐘</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-2 mb-3">
+                    <div class="bg-amber-500 h-2 rounded-full" style="width: 60%"></div>
+                </div>
+
+                <div class="flex justify-between text-xs font-semibold mb-1">
+                    <span class="text-sped-600">綜合活動 (評量與Padlet成果展示)</span>
+                    <span class="text-slate-500">${p3} 分鐘</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-2">
+                    <div class="bg-sped-500 h-2 rounded-full" style="width: 20%"></div>
+                </div>
+            `;
+        }
+
+        // --- WIZARD NAVIGATION LOGIC ---
+        function nextStep() {
+            if (state.step < 5) {
+                // Read fields before moving
+                if (state.step === 1) {
+                    state.customTitle = document.getElementById('custom-title').value;
+                    updateAcademics(); // auto updates dynamic text in step 4
+                } else if (state.step === 3) {
+                    state.strategies.task = document.getElementById('strat-task').checked;
+                    state.strategies.visual = document.getElementById('strat-visual').checked;
+                    state.strategies.reinforce = document.getElementById('strat-reinforce').checked;
+                } else if (state.step === 4) {
+                    state.wordwallTemplate = document.getElementById('wordwall-template').value;
+                    state.wordwallDesc = document.getElementById('wordwall-desc').value;
+                    state.padletTemplate = document.getElementById('padlet-template').value;
+                    state.padletDesc = document.getElementById('padlet-desc').value;
+                    
+                    // Generate Lesson Plan!
+                    generateLessonPlan();
+                }
+
+                document.getElementById(`step-content-${state.step}`).classList.add('hidden');
+                document.getElementById(`step-content-${state.step}`).classList.remove('block');
+                
+                state.step++;
+                
+                document.getElementById(`step-content-${state.step}`).classList.add('block');
+                document.getElementById(`step-content-${state.step}`).classList.remove('hidden');
+                
+                updateWizardProgress();
+            }
+        }
+
+        function prevStep() {
+            if (state.step > 1) {
+                document.getElementById(`step-content-${state.step}`).classList.add('hidden');
+                document.getElementById(`step-content-${state.step}`).classList.remove('block');
+                
+                state.step--;
+                
+                document.getElementById(`step-content-${state.step}`).classList.add('block');
+                document.getElementById(`step-content-${state.step}`).classList.remove('hidden');
+                
+                updateWizardProgress();
+            }
+        }
+
+        function resetWizard() {
+            // Using a custom beautiful modal or simple state reset to avoid browser block
+            state.step = 5; // to hide current step correctly
+            prevStep();
+            state.step = 1;
+            
+            // Hide all steps, show first
+            for(let i=1; i<=5; i++) {
+                const el = document.getElementById(`step-content-${i}`);
+                if(i === 1) {
+                    el.classList.remove('hidden');
+                    el.classList.add('block');
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('block');
+                }
+            }
+            
+            selectDomain('vocational');
+            updateAcademics();
+            setSessions(1);
+            updateWizardProgress();
+            showToast("教案設定已重設為徐老師推薦模組！", "info");
+        }
+
+        function updateWizardProgress() {
+            // Update node colors
+            for (let i = 1; i <= 5; i++) {
+                const node = document.getElementById(`step-node-${i}`);
+                const span = node.nextElementSibling;
+                if (i < state.step) {
+                    // Completed step
+                    node.className = "w-10 h-10 rounded-full flex items-center justify-center bg-sped-500 text-white font-bold shadow-md transition-all duration-300";
+                    node.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    span.className = "text-xs mt-2 font-semibold text-sped-600";
+                } else if (i === state.step) {
+                    // Current step
+                    node.className = "w-10 h-10 rounded-full flex items-center justify-center bg-brand-600 text-white font-bold shadow-md ring-4 ring-brand-100 transition-all duration-300";
+                    node.innerHTML = i;
+                    span.className = "text-xs mt-2 font-bold text-brand-700";
+                } else {
+                    // Pending step
+                    node.className = "w-10 h-10 rounded-full flex items-center justify-center bg-slate-200 text-slate-600 font-bold transition-all duration-300";
+                    node.innerHTML = i;
+                    span.className = "text-xs mt-2 text-slate-400 font-medium";
+                }
+            }
+
+            // Update Progress Line Fill
+            const bar = document.getElementById('progress-bar');
+            const percent = ((state.step - 1) / 4) * 100;
+            bar.style.width = `${percent}%`;
+
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (state.step === 1) {
+                prevBtn.classList.add('invisible');
+            } else {
+                prevBtn.classList.remove('invisible');
+            }
+
+            if (state.step === 5) {
+                nextBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> 重新生成教案';
+            } else {
+                nextBtn.innerHTML = '下一步 <i class="fa-solid fa-arrow-right ml-2"></i>';
+            }
+        }
+
+        // --- LESSON PLAN GENERATOR ALGORITHM ---
+        function generateLessonPlan() {
+            const preview = document.getElementById('document-preview');
+            
+            const title = state.customTitle || "未命名單元";
+            const domainName = domains[state.selectedDomain].title;
+            const disabilityText = getDisabilityTypeName(state.disabilityType);
+            const severityText = state.severity === 'mild' ? '輕度' : (state.severity === 'moderate' ? '中度' : '重度');
+            const totalMinutes = state.sessions * 50;
+
+            // Generate content pieces based on selections
+            const objectives = getLearningObjectives(state.selectedDomain, title);
+            const preSkills = getPrerequisiteSkills(state.selectedDomain);
+            const traitListHTML = state.selectedTraits.map(t => `<li>※ ${t}</li>`).join('');
+            const adjustmentsHTML = getSpEdAdjustments();
+            
+            // Build detailed phase procedures
+            const warmUpProc = getWarmUpProcedures(title, disabilityText);
+            const devProc = getDevelopmentalProcedures(title, disabilityText);
+            const wrapUpProc = getWrapUpProcedures(title, disabilityText);
+
+            // Time breakdown
+            const t1 = Math.round(totalMinutes * 0.2);
+            const t2 = Math.round(totalMinutes * 0.6);
+            const t3 = Math.round(totalMinutes * 0.2);
+
+            // Constructing beautiful, highly stylized school-compliant Word/Google Doc ready layout.
+            const docHTML = `
+                <div id="pdf-export-area" style="font-family: 'Times New Roman', 'Noto Sans TC', sans-serif; line-height: 1.6; color: #1a1a1a; padding: 10px;">
+                    <!-- Document Header -->
+                    <div style="text-align: center; border-bottom: 3px double #0284c7; padding-bottom: 12px; margin-bottom: 24px;">
+                        <h1 style="font-size: 22px; font-weight: bold; color: #0369a1; margin: 0 0 4px 0;">徐淑珍老師分享 - 特教高職部結合 Wordwall & Padlet 遊戲教案</h1>
+                        <p style="font-size: 12px; color: #475569; margin: 0;">符合十二年國民基本教育特殊教育課程綱要・IEP調整指引</p>
+                    </div>
+
+                    <!-- Meta Information Table -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px;">
+                        <tr>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; background-color: #f8fafc; font-weight: bold; width: 15%;">教學領域</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; width: 35%;">${domainName}</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; background-color: #f8fafc; font-weight: bold; width: 15%;">教學主題</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; width: 35%; font-weight: bold; color: #0369a1;">${title}</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; background-color: #f8fafc; font-weight: bold;">教學對象</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px;">高職部【${disabilityText}】班（${severityText}）</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; background-color: #f8fafc; font-weight: bold;">教學時間</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px;">共 ${state.sessions} 節課（計 ${totalMinutes} 分鐘）</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; background-color: #f8fafc; font-weight: bold;">教學架構</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; font-weight: bold; color: #16a34a;">徐淑珍老師特教遊戲化教學模組</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px; background-color: #f8fafc; font-weight: bold;">教學教材</td>
+                            <td style="border: 1px solid #94a3b8; padding: 8px;">自編結構化教材、Wordwall數位教具、Padlet展示牆</td>
+                        </tr>
+                    </table>
+
+                    <!-- Section: Student Characteristics -->
+                    <h3 style="font-size: 15px; font-weight: bold; color: #0284c7; border-left: 4px solid #0ea5e9; padding-left: 8px; margin: 15px 0 8px 0;">一、 學生起點行為與學習特質分析</h3>
+                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 15px; font-size: 12px;">
+                        <ul style="margin: 0; padding-left: 18px; line-height: 1.8;">
+                            ${traitListHTML}
+                            <li>※ 起點知能：${preSkills}</li>
+                        </ul>
+                    </div>
+
+                    <!-- Section: Objectives -->
+                    <h3 style="font-size: 15px; font-weight: bold; color: #0284c7; border-left: 4px solid #0ea5e9; padding-left: 8px; margin: 15px 0 8px 0;">二、 教學目標（結合IEP個案教育需求）</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #f1f5f9; text-align: left;">
+                                <th style="border: 1px solid #d1d5db; padding: 6px; width: 30%;">認知領域目標</th>
+                                <th style="border: 1px solid #d1d5db; padding: 6px; width: 40%;">技能操作目標（精細/粗大動作）</th>
+                                <th style="border: 1px solid #d1d5db; padding: 6px; width: 30%;">情意/社會適應目標</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #d1d5db; padding: 8px; vertical-align: top;">${objectives.cognitive}</td>
+                                <td style="border: 1px solid #d1d5db; padding: 8px; vertical-align: top;">${objectives.skill}</td>
+                                <td style="border: 1px solid #d1d5db; padding: 8px; vertical-align: top;">${objectives.affective}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Section: Adaptations & Support -->
+                    <h3 style="font-size: 15px; font-weight: bold; color: #0284c7; border-left: 4px solid #0ea5e9; padding-left: 8px; margin: 15px 0 8px 0;">三、 特殊教育教學調整與支持策略 (IEP 調整)</h3>
+                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 15px; font-size: 12px; background-color: #faf5ff;">
+                        ${adjustmentsHTML}
+                    </div>
+
+                    <!-- Page break cue for PDF conversion if large -->
+                    <div class="html2pdf__page-break"></div>
+
+                    <!-- Section: Lesson Flow -->
+                    <h3 style="font-size: 15px; font-weight: bold; color: #0284c7; border-left: 4px solid #0ea5e9; padding-left: 8px; margin: 15px 0 8px 0;">四、 結構化教學活動流程</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 11px; line-height: 1.5;">
+                        <thead>
+                            <tr style="background-color: #0284c7; color: white; text-align: left;">
+                                <th style="border: 1px solid #0284c7; padding: 8px; width: 12%; text-align: center;">教學階段</th>
+                                <th style="border: 1px solid #0284c7; padding: 8px; width: 58%;">教學步驟與具體內容活動</th>
+                                <th style="border: 1px solid #0284c7; padding: 8px; width: 10%; text-align: center;">時間</th>
+                                <th style="border: 1px solid #0284c7; padding: 8px; width: 20%;">特教與數位教具提示</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Stage 1: Prep -->
+                            <tr>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold; text-align: center; background-color: #f8fafc; color: #0369a1;">
+                                    準備活動<br><span style="font-size: 9px; font-weight: normal;">(引起動機)</span>
+                                </td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; vertical-align: top;">
+                                    ${warmUpProc}
+                                </td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-weight: bold; color: #475569;">${t1} 分</td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; vertical-align: top; background-color: #f8fafc; color: #475569; font-size: 10px;">
+                                    <strong>核心教具：</strong><br>
+                                    ● 實物/實作教具<br>
+                                    ● 視覺提示圖卡<br><br>
+                                    <strong>IEP調整策略：</strong><br>
+                                    ● 提供視覺計時器<br>
+                                    ● 簡短口語指導
+                                </td>
+                            </tr>
+
+                            <!-- Stage 2: Developmental -->
+                            <tr>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold; text-align: center; background-color: #fffbeb; color: #b45309;">
+                                    發展活動<br><span style="font-size: 9px; font-weight: normal;">(實作與遊戲)</span>
+                                </td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; vertical-align: top;">
+                                    ${devProc}
+                                </td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-weight: bold; color: #b45309;">${t2} 分</td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; vertical-align: top; background-color: #fffbeb; color: #b45309; font-size: 10px;">
+                                    <strong>核心教具：</strong><br>
+                                    ● 實作材料套件<br>
+                                    ● <span style="color: #0284c7; font-weight: bold;">Wordwall 互動:</span><br>
+                                    [${state.wordwallTemplate === 'matching' ? '配對遊戲' : (state.wordwallTemplate === 'wheel' ? '隨機輪盤' : '簡單測驗')}]<br><br>
+                                    <strong>IEP調整策略：</strong><br>
+                                    ● <strong>工作分析</strong>拆解<br>
+                                    ● 同儕雙人協作<br>
+                                    ● 實作與虛擬轉換
+                                </td>
+                            </tr>
+
+                            <!-- Stage 3: Wrap Up -->
+                            <tr>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold; text-align: center; background-color: #f0fdf4; color: #15803d;">
+                                    綜合活動<br><span style="font-size: 9px; font-weight: normal;">(回饋與分享)</span>
+                                </td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; vertical-align: top;">
+                                    ${wrapUpProc}
+                                </td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-weight: bold; color: #15803d;">${t3} 分</td>
+                                <td style="border: 1px solid #cbd5e1; padding: 8px; vertical-align: top; background-color: #f0fdf4; color: #15803d; font-size: 10px;">
+                                    <strong>核心教具：</strong><br>
+                                    ● <span style="color: #ec4899; font-weight: bold;">Padlet 學習牆:</span><br>
+                                    [${state.padletTemplate === 'gallery' ? '成果展示牆' : (state.padletTemplate === 'column' ? '步驟排序欄' : '感恩回饋板')}]<br><br>
+                                    <strong>IEP調整策略：</strong><br>
+                                    ● <strong>代幣增強</strong>給獎<br>
+                                    ● 簡化評量<br>
+                                    ● 強化自我效能
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Section: Evaluation & Assessment -->
+                    <h3 style="font-size: 15px; font-weight: bold; color: #0284c7; border-left: 4px solid #0ea5e9; padding-left: 8px; margin: 15px 0 8px 0;">五、 多元評量與個別化調整對策</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 12px;">
+                        <tr style="background-color: #f8fafc;">
+                            <td style="border: 1px solid #d1d5db; padding: 8px; font-weight: bold; width: 25%;">實作評量 (占50%)</td>
+                            <td style="border: 1px solid #d1d5db; padding: 8px; width: 75%;">依據「工作分析步驟檢核表」，評估學生獨立完成或在提示下完成之步驟百分比。</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #d1d5db; padding: 8px; font-weight: bold;">數位互動評量 (占30%)</td>
+                            <td style="border: 1px solid #d1d5db; padding: 8px;">Wordwall 配對完成率及反應次數；Padlet 學習成果上傳與自我指認情況。</td>
+                        </tr>
+                        <tr style="background-color: #f8fafc;">
+                            <td style="border: 1px solid #d1d5db; padding: 8px; font-weight: bold;">情意評量 (占20%)</td>
+                            <td style="border: 1px solid #d1d5db; padding: 8px;">觀察學生的操作安全意識、工具保養、正面社交互動（Padlet按讚）及課堂參與專注度。</td>
+                        </tr>
+                    </table>
+                </div>
+            `;
+
+            preview.innerHTML = docHTML;
+        }
+
+        // --- HELPER GENERATORS FOR TEXT BLOCKS ---
+        function getLearningObjectives(domain, title) {
+            if (domain === 'vocational') {
+                return {
+                    cognitive: "1. 能正確指認並說出「" + title + "」所需的 3 種工具與材料。<br>2. 能明白操作安全守則與衛生常規。",
+                    skill: "1. 能在支持下完成拆解的步驟。<br>2. 遵循『工作分析表』流程完成多數操作。<br>3. 進行工具整理歸位。",
+                    affective: "1. 表現出工作專注與耐心。<br>2. 遇困難時主動利用圖卡或舉手示意求助。<br>3. 收拾桌面環境。"
+                };
+            } else if (domain === 'social') {
+                return {
+                    cognitive: "1. 能辨識本單元相關社會場域核心標示。<br>2. 理解社交行為步驟與禮儀規範。",
+                    skill: "1. 正確做出目標社交動作（如：感應卡刷卡、付款）。<br>2. 情境中配合指示順利完成活動流程。",
+                    affective: "1. 在公共場域維持適當音量並控制情緒。<br>2. 展現基本禮貌用語或非口語社交動作。<br>3. 體驗融入社區生活的樂趣。"
+                };
+            } else {
+                return {
+                    cognitive: "1. 指認並區分本單元安全生活品項。<br>2. 理解自主生活的核心步驟與危險預防。",
+                    skill: "1. 獨立完成核心自主生活動作。<br>2. 遭遇模擬危機時能做出正確反應。",
+                    affective: "1. 建立良好個人生活常規與自理信心。<br>2. 面對生活挑戰時展現配合的態度。"
+                };
+            }
+        }
+
+        function getPrerequisiteSkills(domain) {
+            if (domain === 'vocational') {
+                return "學生具備基礎的單手抓握與雙手協調能力，能聽懂兩步驟以內的口語指導，並擁有基礎的班級增強集點經驗。";
+            } else if (domain === 'social') {
+                return "學生能聽懂簡單的公共口語廣播，能在成人陪同下於社區行走，並具備基礎的物品／金錢對應概念。";
+            } else {
+                return "學生能辨識基礎的生活用品，能安全在室內行走，且已養成與教師或同儕進行眼神接觸與點頭示意之習慣。";
+            }
+        }
+
+        function getSpEdAdjustments() {
+            let html = '<ul style="margin: 0; padding-left: 18px; line-height: 1.8;">';
+            
+            if (state.strategies.task) {
+                html += `<li><strong>● 課程內容調整（工作分析）：</strong> 將「${state.customTitle || state.subTheme}」細緻拆解為 5~8 個直觀子步驟，並印製成『工作分析核對表』，供學生每完成一步即在格中打勾。</li>`;
+            }
+            if (state.strategies.visual) {
+                html += `<li><strong>● 教學過程調整（視覺化支持）：</strong> 採用圖文並茂的步驟大圖卡、實物投影示範、以及 Wordwall 互動配對圖。搭配高對比標識以協助自閉症與智能障礙學生掌握空間架構。</li>`;
+            }
+            if (state.strategies.reinforce) {
+                html += `<li><strong>● 評量與行為調整（代幣增強）：</strong> 建立課堂「即時代幣增強表」。學生每完成一個工作單元或專注 10 分鐘，即可獲得貼紙或印章一枚，集滿指定點數可於課堂結束時兌換正增強物。</li>`;
+            }
+
+            // General Adjustments based on severity
+            if (state.severity === 'severe') {
+                html += `<li><strong>● 重度障礙專屬調整：</strong> 採取「1對1同儕小老師或教師助理員密集協助」，不強調精細工具的獨立操作，改以「肢體物理引導（Hand-over-hand）」協助其參與核心環節，著重在情意體驗與動作刺激。</li>`;
+            } else if (state.severity === 'moderate') {
+                html += `<li><strong>● 中度障礙專屬調整：</strong> 提供半獨立工作架構，運用「口頭提示 + 視覺線索」引導其自行修正錯誤，強調能獨立完成 70% 的工作分析步驟。</li>`;
+            }
+
+            html += '</ul>';
+            return html;
+        }
+
+        function getWarmUpProcedures(title, disText) {
+            return `
+                <p style="margin: 0 0 4px 0; font-weight: bold; color: #0369a1;">【引起動機：實物生活連結】</p>
+                <ol style="margin: 0; padding-left: 15px;">
+                    <li style="margin-bottom: 4px;"><strong>點名問候：</strong> 運用大字體與高對比點名板進行暖身，引導學生口語答到、按壓錄音或揮手，穩定學習情緒。</li>
+                    <li style="margin-bottom: 4px;"><strong>實物探索：</strong> 出示與「${title}」直接相關實物，提供感官指認。</li>
+                    <li style="margin-bottom: 4px;"><strong>口語引導：</strong> 詢問：「這在日常哪裡看過？」重度生提供大圖卡（是/否標識）指認。</li>
+                    <li style="margin-bottom: 4px;"><strong>目標宣告：</strong> 運用倒數視覺計時器說明今日任務與集點目標。</li>
+                </ol>
+            `;
+        }
+
+        function getDevelopmentalProcedures(title, disText) {
+            let wwText = state.wordwallDesc || "操作 Wordwall 互動教具確認觀念。";
+            let taskDetail = "";
+            
+            if (state.selectedDomain === 'vocational') {
+                taskDetail = `
+                    <li style="margin-bottom: 6px;"><strong>清潔準備：</strong> 引導學生穿戴圍裙、頭巾並洗手。</li>
+                    <li style="margin-bottom: 6px;"><strong>工具與Wordwall：</strong> 示範工具，引導學生輪流操作 <strong>Wordwall [${state.wordwallTemplate}]</strong>：<br>
+                        <span style="color: #0284c7; background-color: #f0f9ff; padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 2px 0; font-size: 10px;">
+                            <i class="fa-solid fa-gamepad mr-1"></i> ${wwText}
+                        </span>
+                    </li>
+                    <li style="margin-bottom: 6px;"><strong>步驟實作：</strong> 教師依『工作分析表』示範「${title}」步驟。二人一組，由輕度協助中重度同儕，教師提供手勢或肢體引導。</li>
+                `;
+            } else if (state.selectedDomain === 'social') {
+                taskDetail = `
+                    <li style="margin-bottom: 6px;"><strong>情境布置：</strong> 布置擬真情境區（公車刷卡機、收銀檯、診所等）。</li>
+                    <li style="margin-bottom: 6px;"><strong>Wordwall認知：</strong> 操作 <strong>Wordwall [${state.wordwallTemplate}]</strong> 進行情境與標誌配對：<br>
+                        <span style="color: #0284c7; background-color: #f0f9ff; padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 2px 0; font-size: 10px;">
+                            <i class="fa-solid fa-gamepad mr-1"></i> ${wwText}
+                        </span>
+                    </li>
+                    <li style="margin-bottom: 6px;"><strong>角色扮演：</strong> 分組扮演乘客或店員，依照工作分析卡演練。使用增強幣激勵良好排隊行為。</li>
+                `;
+            } else {
+                taskDetail = `
+                    <li style="margin-bottom: 6px;"><strong>工具指認：</strong> 實物展示，讓學生觸摸分類。</li>
+                    <li style="margin-bottom: 6px;"><strong>Wordwall觀念：</strong> 操作 <strong>Wordwall [${state.wordwallTemplate}]</strong> 進行排序或正誤判斷：<br>
+                        <span style="color: #0284c7; background-color: #f0f9ff; padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 2px 0; font-size: 10px;">
+                            <i class="fa-solid fa-gamepad mr-1"></i> ${wwText}
+                        </span>
+                    </li>
+                    <li style="margin-bottom: 6px;"><strong>模擬實練：</strong> 安全模擬情境中實作（洗手、回收分類、逃生），紀錄熟練度。</li>
+                `;
+            }
+
+            return `
+                <p style="margin: 0 0 4px 0; font-weight: bold; color: #b45309;">【發展活動：技能拆解實作與數位探究】</p>
+                <ol style="margin: 0; padding-left: 15px;">
+                    ${taskDetail}
+                </ol>
+            `;
+        }
+
+        function getWrapUpProcedures(title, disText) {
+            let padText = state.padletDesc || "引導學生在 Padlet 專屬牆上分享成果並給予肯定。";
+            return `
+                <p style="margin: 0 0 4px 0; font-weight: bold; color: #15803d;">【綜合活動：成果上傳與社會正增強】</p>
+                <ol style="margin: 0; padding-left: 15px;">
+                    <li style="margin-bottom: 4px;"><strong>成果分享 (Padlet)：</strong> 拍攝學生「${title}」成果，投射在 <strong>Padlet [${state.padletTemplate === 'gallery' ? '成果牆' : (state.padletTemplate === 'column' ? '步驟排序欄' : '感恩回饋板')}]</strong>上：<br>
+                        <span style="color: #ec4899; background-color: #fdf2f8; padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 2px 0; font-size: 10px;">
+                            <i class="fa-solid fa-signs-post mr-1"></i> ${padText}
+                        </span>
+                    </li>
+                    <li style="margin-bottom: 4px;"><strong>自評他評：</strong> 認出「這是誰的作品？」並引導同儕大聲給予讚賞：「你很棒！」</li>
+                    <li style="margin-bottom: 4px;"><strong>代幣結算：</strong> 統計增強點數。達標者領取「今日之星」，未達標者也給予「努力獎勵」，確保成就感。</li>
+                    <li style="margin-bottom: 4px;"><strong>常規與收拾：</strong> 工具歸位、整理桌面與洗手，有序排隊離班。</li>
+                </ol>
+            `;
+        }
+
+        // --- EXPORT & UTILITY FUNCTIONS ---
+        function showToast(message, type = "success") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: "bg-emerald-600 text-white",
+                error: "bg-rose-600 text-white",
+                info: "bg-blue-600 text-white"
+            };
+
+            const icons = {
+                success: "fa-circle-check",
+                error: "fa-circle-exclamation",
+                info: "fa-circle-info"
+            };
+
+            toast.className = `${colors[type]} px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2.5 text-xs font-semibold pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type]} text-base"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            // Remove toast after 3s
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        function copyToClipboard() {
+            const preview = document.getElementById('document-preview');
+            
+            // Create temporary textarea to copy rich plain text or HTML
+            const range = document.createRange();
+            range.selectNode(preview);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast("已將教案排版複製到您的剪貼簿！可直接貼上 Google Docs 或 MS Word。");
+                } else {
+                    showToast("複製失敗，請手動全選複製預覽區文字。", "error");
+                }
+            } catch (err) {
+                showToast("瀏覽器不支援此一鍵複製，請手動全選複製。", "error");
+            }
+            window.getSelection().removeAllRanges();
+        }
+
+        function downloadAsDoc() {
+            const content = document.getElementById('document-preview').innerHTML;
+            const title = state.customTitle || "徐淑珍老師特教高職部教案";
+
+            // Microsoft Office Word HTML Wrap
+            const convertedHtml = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <title>${title}</title>
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <w:WordDocument>
+                            <w:View>Print</w:View>
+                            <w:Zoom>100</w:Zoom>
+                            <w:DoNotOptimizeForBrowser/>
+                        </w:WordDocument>
+                    </xml>
+                    <![endif]-->
+                    <style>
+                        p.MsoNormal, li.MsoNormal, div.MsoNormal {
+                            margin: 0in;
+                            margin-bottom: .0001pt;
+                            font-size: 11.0pt;
+                            font-family: "Calibri","sans-serif";
+                        }
+                        @page Section1 {
+                            size: 8.5in 11.0in;
+                            margin: 1.0in 1.0in 1.0in 1.0in;
+                            mso-header-margin: .5in;
+                            mso-footer-margin: .5in;
+                            mso-paper-source: 0;
+                        }
+                        div.Section1 {
+                            page: Section1;
+                        }
+                    </style>
+                </head>
+                <body lang=ZH-TW style='tab-interval:.5in'>
+                    <div class="Section1">
+                        ${content}
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff' + convertedHtml], {
+                type: 'application/msword;charset=utf-8'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title} - 徐淑珍老師分享教案.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("您的 Google Docs / Word 相容教案已開始下載！");
+        }
+
+        // --- NEW: DIRECT PDF DOWNLOAD FUNCTION (Using html2pdf.js) ---
+        function downloadAsPDF() {
+            // Target the inside of the editable iframe-style container
+            const element = document.getElementById('pdf-export-area');
+            if (!element) {
+                showToast("教案內容尚未就緒，請重新整理教案。", "error");
+                return;
+            }
+
+            const title = state.customTitle || "特教高職部教案";
+            showToast("正在編譯 PDF 中，這可能需要數秒，請稍候...", "info");
+
+            const opt = {
+                margin:       10,
+                filename:     `${title} - 徐淑珍老師分享教案.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Run html2pdf
+            html2pdf().set(opt).from(element).save()
+                .then(() => {
+                    showToast("PDF 下載成功！", "success");
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast("PDF 生成失敗，請改用「直接列印」->「另存為 PDF」。", "error");
+                });
+        }
+    </script>
+</body>
+</html>
